@@ -32,44 +32,43 @@ function start() {
         if (err) {
             console.log(err);
         }
-        console.log(res);
+        // console.log(res);
         // TODO prettify
-
+        askForProduct(res);
     })      
 
     // after display results, ask customer what to purchase
-     askForProduct(res);
+
 
 }
 function askForProduct (inventory) {
 
     inquirer
-    .prompt ([
-        name: "choice",
-            type: "rawlist",
-            choices: function() {
-              var choiceArray = [];
-              for (var i = 0; i < results.length; i++) {
-                choiceArray.push(results[i].item_id);
-              }
-              return choiceArray;
-            },
-            message: "What item_id would you like?"
-          ,
-          {
-            name: "product",
-            type: "input",
-            message: "How many items do you want?"
-          }
-        ])
+    .prompt ([ {
+        name: "product",
+        type: "input",
+        message: "Enter the id of the item you would like to purchase"
+
+        }])
         .then(function(answer) {
-          var chosenItem;
-          for (var i = 0; i < results.length; i++) {
-            if (results[i].item_id === answer.choice) {
-              chosenItem = results[i];
-            }
-            
-          } 
+        var productInfo = checkQuantity(inventory, answer.product)
+        console.log(productInfo);
+
+        if (!productInfo) {
+            console.log("Please enter a valid product");
+            askForProduct();
+        }
+        
+          else if (productInfo.qty) {
+              askForQuantity(inventory, answer.product)
+
+          }
+          else {
+              console.log("Item is not available");
+              start();
+          }
+
+         }      
     )};
 
     // prompt the customer and ask them the id the item they want to purchase
@@ -84,26 +83,24 @@ function askForProduct (inventory) {
         // if is not tell them they cannot order anything and show the product again
 
 
+function askForQuantity (inventory, id) {
 
-}
-function askForQuantity (inventory) {
-    inquirer
-    .prompt ([
-        name: "choice",
-            type: "rawlist",
-            choices: function() {
-              var choiceArray = [];
-              for (var i = 0; i < results.length; i++) {
-                choiceArray.push(results[i].stock_quantity);
-              }
-              return choiceArray;
-            },
-            message: "Checking to see if product is available"
-            ,
-            {
-              name: "quantity",
-              type: "input",
-              message: "would you like to make a purchase?"
+        inquirer
+        .prompt ([{
+         name:"quantity",
+         type:"input",
+         message:"Enter quantity"
+         }]) 
+        .then(function(answer){
+        var productInfo = checkQuantity(inventory, id, answer.quantity)
+        if(productInfo.qty >= answer.quantity) {
+         makePurchase(id, productInfo, answer.quantity)
+    }
+    else {
+        console.log("Quantity not available");
+        start();
+    }
+        })
     // prompt for quantity
 
     // check to see if that qunatity is available
@@ -116,31 +113,44 @@ function askForQuantity (inventory) {
 
 }
 function checkQuantity (inventory, id) {
+    
+    
+    for(var i = 0; i <inventory.length;i++){
+        console.log(inventory[i]);
+        
+        if(inventory[i].id===parseInt(id)) {
+            return {
+                qty: inventory[i].stock_quantity, 
+                price:inventory[i].price}
+        }
+    }
+    
     // find the item and make sure it is available
 }
-function makePurchase (prodcuts, quantity) {
+function makePurchase (id, product, qty) {
     connection.query(
         "UPDATE products SET ? WHERE ?",
         [
           {
-            stock_quantitu: answer
+            stock_quantity: product.qty - qty
           },
           {
-            id: chosenItem.id
+            id: id
           }
         ],
-        function(error) {
-          if (error) throw err;
-          console.log("Total of purchase");
+        function(err, res) { 
+          if (err) throw err;
+          console.log("Purchase was successful, order total; "+ qty*product.price);
+          start();
         }
+
+
       );
     
-    else {
-      console.log("Here are some other products");
+    
     // update inventory 
 
     // let the customer know the total
 
     // show the products again
     }
-};
