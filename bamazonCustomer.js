@@ -33,17 +33,44 @@ function start() {
             console.log(err);
         }
         console.log(res);
+        // TODO prettify
 
     })      
 
-
-        // display the results
-
     // after display results, ask customer what to purchase
-    // askForProduct(res);
+     askForProduct(res);
 
 }
 function askForProduct (inventory) {
+
+    inquirer
+    .prompt ([
+        name: "choice",
+            type: "rawlist",
+            choices: function() {
+              var choiceArray = [];
+              for (var i = 0; i < results.length; i++) {
+                choiceArray.push(results[i].item_id);
+              }
+              return choiceArray;
+            },
+            message: "What item_id would you like?"
+          ,
+          {
+            name: "product",
+            type: "input",
+            message: "How many items do you want?"
+          }
+        ])
+        .then(function(answer) {
+          var chosenItem;
+          for (var i = 0; i < results.length; i++) {
+            if (results[i].item_id === answer.choice) {
+              chosenItem = results[i];
+            }
+            
+          } 
+    )};
 
     // prompt the customer and ask them the id the item they want to purchase
 
@@ -60,6 +87,23 @@ function askForProduct (inventory) {
 
 }
 function askForQuantity (inventory) {
+    inquirer
+    .prompt ([
+        name: "choice",
+            type: "rawlist",
+            choices: function() {
+              var choiceArray = [];
+              for (var i = 0; i < results.length; i++) {
+                choiceArray.push(results[i].stock_quantity);
+              }
+              return choiceArray;
+            },
+            message: "Checking to see if product is available"
+            ,
+            {
+              name: "quantity",
+              type: "input",
+              message: "would you like to make a purchase?"
     // prompt for quantity
 
     // check to see if that qunatity is available
@@ -75,9 +119,28 @@ function checkQuantity (inventory, id) {
     // find the item and make sure it is available
 }
 function makePurchase (prodcuts, quantity) {
+    connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+          {
+            stock_quantitu: answer
+          },
+          {
+            id: chosenItem.id
+          }
+        ],
+        function(error) {
+          if (error) throw err;
+          console.log("Total of purchase");
+        }
+      );
+    
+    else {
+      console.log("Here are some other products");
     // update inventory 
 
     // let the customer know the total
 
     // show the products again
-}
+    }
+};
