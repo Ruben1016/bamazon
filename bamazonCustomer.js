@@ -38,7 +38,7 @@ function start() {
     })      
 
     // after display results, ask customer what to purchase
-
+    // hellooooooooooooo
 
 }
 function askForProduct (inventory) {
@@ -154,3 +154,9 @@ function makePurchase (id, product, qty) {
 
     // show the products again
     }
+
+    // TODO list: find a better way to display data console.table
+    // myabe console log for loop for each item
+    // polish comments double check tabbing
+    // ask if they want to start again
+    // trak the user spent if they purchase multiple purchases. 
