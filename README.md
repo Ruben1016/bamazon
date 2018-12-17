@@ -1,2 +1,2 @@
 # bamazon
-![](bamazon.gif)
+![](./giphy/bamazon.gif)
